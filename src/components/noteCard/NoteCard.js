@@ -1,6 +1,5 @@
-import React from 'react';
-import UpdateModal from '../updateModal/UpdateModal';
-
+import React from "react";
+import UpdateModal from "../updateModal/UpdateModal";
 
 const customStyles = {
   position: "absolute",
@@ -10,9 +9,7 @@ const customStyles = {
   width: "80px",
 };
 
-const NoteCard = ({ note }) => {
-
-
+const NoteCard = ({ note, handleDeletePost, setNoteRes }) => {
   return (
     <div className="col mt-5" style={{ position: "relative" }}>
       <div className="rounded h-100 color-060930 note-card">
@@ -21,8 +18,7 @@ const NoteCard = ({ note }) => {
           style={customStyles}
         >
           <p className="text-center p-2  fs-2 fw-bold text-dark">
-            {" "}
-            {note.user_name.substring(0, 1)}
+            {note?.user_name?.substring(0, 1)}
           </p>
         </div>
         <div className="card-body mt-5">
@@ -32,14 +28,14 @@ const NoteCard = ({ note }) => {
         <div className="card-footer d-flex justify-content-center">
           <div>
             <button
-              className="color-801336 btn btn-sm mx-2 "
-              
+              onClick={() => handleDeletePost(note._id)}
+              className="color-801336 btn btn-sm mx-2"
             >
               delete
             </button>
           </div>
           {/* <button>update</button> */}
-          <UpdateModal  />
+          <UpdateModal setNoteRes={setNoteRes} note={note} />
         </div>
       </div>
     </div>

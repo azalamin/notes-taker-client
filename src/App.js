@@ -1,49 +1,44 @@
-import logo from "./logo.svg";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Header from "./components/header/Header";
 import InputForm from "./components/inputForm/InputForm";
 import NoteCard from "./components/noteCard/NoteCard";
-import { useEffect, useState } from "react";
-
-
 
 function App() {
   const [notes, setNotes] = useState([]);
+  const [noteRes, setNoteRes] = useState({});
 
-  useEffect(() => {
+  const handleSearchNotes = (event) => {
+    event.preventDefault();
+    const queryText = event.target.searchText.value;
+    if (queryText) {
+      fetch(`http://localhost:5000/notes?user_name=${queryText}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+      })
+    }
+  }
 
-   fetch("notes.json")
-   .then(res=>res.json())
-   .then(data=>setNotes(data))
+   useEffect(() => {
+     fetch("http://localhost:5000/notes")
+       .then((res) => res.json())
+       .then((data) => setNotes(data));
+   }, [noteRes]);
 
-    
-  }, []);
-  /*
-1. here there will be a function named handleSearch
-to handle search by query, and it will be passed as props to header
-
-  */
-  
-
-
-
-
-
-
-  
-/*2. here there will be a function named handleDelete
-to delete a note, and it will be passed as props to NoteCard that will be triggered using delete button.
- */
-
-
-
-
-
-
-
-
-
-
+  // Delete POST
+  const handleDeletePost = (id) => {
+    fetch(`http://localhost:5000/note/${id}`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setNoteRes(data);
+      });
+  };
 
   /*
 3. there will be a function named handleUpdate
@@ -51,27 +46,38 @@ to delete a note, and it will be passed as props to NoteCard that will be trigge
    later it will be passed to Update modal using props.
  */
 
+  // POST Data
+  const handlePost = (event) => {
+    event.preventDefault();
+    const user_name = event.target.user_name.value;
+    const text = event.target.text.value;
+    const newNote = { user_name, text };
 
-
-   
-
-
-
-  /*
-4.  there will be a function named handlePost
-to post data to backend, and it will be passed as props to InputFrom.
- */
-
-  
+    fetch("http://localhost:5000/notes", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newNote),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        event.target.reset();
+        setNoteRes(data);
+      });
+  };
 
   return (
     <div className="App">
-      <Header  />
-      <InputForm />
+      <Header handleSearchNotes={handleSearchNotes} />
+      <InputForm handlePost={handlePost} />
       <div className="row row-cols-1 row-cols-md-3 g-4 m-2">
         {notes.map((note) => (
           <NoteCard
+            key={note._id}
+            handleDeletePost={handleDeletePost}
             note={note}
+            setNoteRes={setNoteRes}
           />
         ))}
       </div>
